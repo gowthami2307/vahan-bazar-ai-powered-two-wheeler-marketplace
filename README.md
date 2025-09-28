@@ -639,7 +639,7 @@ SOFTWARE.
 - Accessibility guidelines
 
 ### **Contributors**
-- **Venkatatejadegala** - Project Lead & Full-Stack Developer
+- **BYTEBREAKERS**
 - **Contributors** - See [CONTRIBUTORS.md](CONTRIBUTORS.md)
 
 ---
