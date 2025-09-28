@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vahan Bazar - Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .demo-banner { background: #2563eb; color: white; padding: 12px; text-align: center; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .bike-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .bike-card { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+        .bike-image { width: 100%; height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+        .bike-info { padding: 16px; }
+        .bike-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .bike-price { color: #059669; font-weight: 600; font-size: 20px; }
+        .bike-specs { margin: 8px 0; font-size: 14px; color: #6b7280; }
+        .login-form { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 4px; font-weight: 500; }
+        .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; margin-left: 10px; }
+        .nav { background: white; padding: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-link { color: #374151; text-decoration: none; }
+        .nav-link:hover { color: #2563eb; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .filters { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-label { margin-bottom: 4px; font-weight: 500; }
+        .filter-input { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; }
+        .admin-panel { background: #fef3c7; border: 1px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 24px; font-weight: 600; color: #2563eb; }
+        .stat-label { color: #6b7280; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Mock data
+        const mockBikes = [
+            {
+                id: 1,
+                name: 'Honda Activa 6G',
+                price: 75000,
+                brand: 'Honda',
+                fuelType: 'Petrol',
+                mileage: 45,
+                image: '🏍️',
+                description: 'The Honda Activa 6G is a popular scooter known for its reliability and fuel efficiency.'
+            },
+            {
+                id: 2,
+                name: 'Ather 450X',
+                price: 150000,
+                brand: 'Ather',
+                fuelType: 'Electric',
+                mileage: 100,
+                image: '⚡',
+                description: 'The Ather 450X is a premium electric scooter with advanced features and long range.'
+            },
+            {
+                id: 3,
+                name: 'Bajaj Pulsar NS200',
+                price: 120000,
+                brand: 'Bajaj',
+                fuelType: 'Petrol',
+                mileage: 50,
+                image: '🏍️',
+                description: 'The Bajaj Pulsar NS200 is a sporty motorcycle with aggressive styling and powerful performance.'
+            },
+            {
+                id: 4,
+                name: 'TVS Apache RTR 160 4V',
+                price: 95000,
+                brand: 'TVS',
+                fuelType: 'Petrol',
+                mileage: 55,
+                image: '🏍️',
+                description: 'The TVS Apache RTR 160 4V offers sporty performance with advanced features.'
+            },
+            {
+                id: 5,
+                name: 'Hero Splendor Plus',
+                price: 65000,
+                brand: 'Hero',
+                fuelType: 'Petrol',
+                mileage: 60,
+                image: '🏍️',
+                description: 'The Hero Splendor Plus is known for its fuel efficiency and low maintenance costs.'
+            },
+            {
+                id: 6,
+                name: 'Yamaha FZ-S V3',
+                price: 110000,
+                brand: 'Yamaha',
+                fuelType: 'Petrol',
+                mileage: 48,
+                image: '🏍️',
+                description: 'The Yamaha FZ-S V3 combines style and performance with modern features.'
+            }
+        ];
+
+        const mockUsers = [
+            { id: 1, username: 'admin', email: 'admin@demo.com', password: 'admin123', role: 'admin' },
+            { id: 2, username: 'john_doe', email: 'john@demo.com', password: 'user123', role: 'user' },
+            { id: 3, username: 'jane_smith', email: 'jane@demo.com', password: 'user123', role: 'user' }
+        ];
+
+        // Components
+        const DemoBanner = () => (
+            <div className="demo-banner">
+                <strong>Demo Mode:</strong> Use these credentials to test the app:
+                <br />
+                <strong>Admin:</strong> admin@demo.com / admin123 | 
+                <strong> Users:</strong> john@demo.com / user123 | jane@demo.com / user123
+            </div>
+        );
+
+        const Navbar = ({ user, onLogout }) => (
+            <nav className="nav">
+                <div className="container">
+                    <div className="nav-content">
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#2563eb' }}>
+                            🏍️ Vahan Bazar
+                        </div>
+                        <div className="nav-links">
+                            <a href="#" className="nav-link">Home</a>
+                            <a href="#" className="nav-link">Bikes</a>
+                            <a href="#" className="nav-link">Used Bikes</a>
+                            <a href="#" className="nav-link">Showrooms</a>
+                            {user && user.role === 'admin' && (
+                                <a href="#" className="nav-link">Admin</a>
+                            )}
+                        </div>
+                        <div className="user-info">
+                            {user ? (
+                                <>
+                                    <span>Welcome, {user.username}!</span>
+                                    <button onClick={onLogout} className="btn btn-secondary">Logout</button>
+                                </>
+                            ) : (
+                                <button className="btn btn-primary">Login</button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        );
+
+        const BikeCard = ({ bike }) => (
+            <div className="bike-card">
+                <div className="bike-image">{bike.image}</div>
+                <div className="bike-info">
+                    <div className="bike-name">{bike.name}</div>
+                    <div className="bike-price">₹{bike.price.toLocaleString()}</div>
+                    <div className="bike-specs">
+                        <div>Brand: {bike.brand}</div>
+                        <div>Fuel: {bike.fuelType}</div>
+                        <div>Mileage: {bike.mileage} km/l</div>
+                    </div>
+                    <button className="btn btn-primary" style={{ width: '100%', marginTop: '12px' }}>
+                        View Details
+                    </button>
+                </div>
+            </div>
+        );
+
+        const Filters = ({ onFilterChange }) => {
+            const [filters, setFilters] = useState({
+                search: '',
+                brand: '',
+                price: '',
+                fuelType: ''
+            });
+
+            const handleChange = (key, value) => {
+                const newFilters = { ...filters, [key]: value };
+                setFilters(newFilters);
+                onFilterChange(newFilters);
+            };
+
+            const brands = [...new Set(mockBikes.map(bike => bike.brand))];
+            const fuelTypes = [...new Set(mockBikes.map(bike => bike.fuelType))];
+
+            return (
+                <div className="filters">
+                    <h3 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600' }}>🔍 Filters</h3>
+                    <div className="filter-grid">
+                        <div className="filter-group">
+                            <label className="filter-label">Search</label>
+                            <input
+                                type="text"
+                                className="filter-input"
+                                placeholder="Search bikes..."
+                                value={filters.search}
+                                onChange={(e) => handleChange('search', e.target.value)}
+                            />
+                        </div>
+                        <div className="filter-group">
+                            <label className="filter-label">Brand</label>
+                            <select
+                                className="filter-input"
+                                value={filters.brand}
+                                onChange={(e) => handleChange('brand', e.target.value)}
+                            >
+                                <option value="">All Brands</option>
+                                {brands.map(brand => (
+                                    <option key={brand} value={brand}>{brand}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="filter-group">
+                            <label className="filter-label">Max Price (₹)</label>
+                            <input
+                                type="number"
+                                className="filter-input"
+                                placeholder="e.g. 100000"
+                                value={filters.price}
+                                onChange={(e) => handleChange('price', e.target.value)}
+                            />
+                        </div>
+                        <div className="filter-group">
+                            <label className="filter-label">Fuel Type</label>
+                            <select
+                                className="filter-input"
+                                value={filters.fuelType}
+                                onChange={(e) => handleChange('fuelType', e.target.value)}
+                            >
+                                <option value="">All Types</option>
+                                {fuelTypes.map(type => (
+                                    <option key={type} value={type}>{type}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const LoginForm = ({ onLogin }) => {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onLogin(email, password);
+            };
+
+            return (
+                <div className="login-form">
+                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>🔐 Login</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label className="form-label">Email</label>
+                            <input
+                                type="email"
+                                className="form-input"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your email"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Password</label>
+                            <input
+                                type="password"
+                                className="form-input"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter your password"
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                            Login
+                        </button>
+                    </form>
+                    <div style={{ marginTop: '16px', fontSize: '14px', color: '#6b7280' }}>
+                        <strong>Demo Credentials:</strong><br />
+                        Admin: admin@demo.com / admin123<br />
+                        User: john@demo.com / user123
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminPanel = ({ user }) => (
+            <div className="admin-panel">
+                <h3 style={{ marginBottom: '16px', color: '#92400e' }}>🛡️ Admin Dashboard</h3>
+                <div className="stats-grid">
+                    <div className="stat-card">
+                        <div className="stat-number">{mockBikes.length}</div>
+                        <div className="stat-label">Total Bikes</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-number">{mockUsers.length}</div>
+                        <div className="stat-label">Total Users</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-number">15</div>
+                        <div className="stat-label">Reviews</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-number">8</div>
+                        <div className="stat-label">Bookings</div>
+                    </div>
+                </div>
+                <div style={{ marginTop: '20px' }}>
+                    <h4 style={{ marginBottom: '12px' }}>Quick Actions:</h4>
+                    <button className="btn btn-primary" style={{ marginRight: '10px' }}>Add New Bike</button>
+                    <button className="btn btn-secondary">Manage Users</button>
+                </div>
+            </div>
+        );
+
+        const BikeList = ({ bikes }) => (
+            <div className="bike-grid">
+                {bikes.map(bike => (
+                    <BikeCard key={bike.id} bike={bike} />
+                ))}
+            </div>
+        );
+
+        // Main App Component
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [showLogin, setShowLogin] = useState(false);
+            const [filteredBikes, setFilteredBikes] = useState(mockBikes);
+
+            const handleLogin = (email, password) => {
+                const foundUser = mockUsers.find(u => u.email === email && u.password === password);
+                if (foundUser) {
+                    const { password, ...userWithoutPassword } = foundUser;
+                    setUser(userWithoutPassword);
+                    setShowLogin(false);
+                } else {
+                    alert('Invalid credentials! Try: admin@demo.com / admin123');
+                }
+            };
+
+            const handleLogout = () => {
+                setUser(null);
+            };
+
+            const handleFilterChange = (filters) => {
+                let filtered = [...mockBikes];
+
+                if (filters.search) {
+                    const searchTerm = filters.search.toLowerCase();
+                    filtered = filtered.filter(bike => 
+                        bike.name.toLowerCase().includes(searchTerm) ||
+                        bike.brand.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                if (filters.brand) {
+                    filtered = filtered.filter(bike => bike.brand === filters.brand);
+                }
+
+                if (filters.price) {
+                    filtered = filtered.filter(bike => bike.price <= parseInt(filters.price));
+                }
+
+                if (filters.fuelType) {
+                    filtered = filtered.filter(bike => bike.fuelType === filters.fuelType);
+                }
+
+                setFilteredBikes(filtered);
+            };
+
+            return (
+                <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+                    <DemoBanner />
+                    <Navbar user={user} onLogout={handleLogout} />
+                    
+                    <div className="container">
+                        {!user && !showLogin && (
+                            <div style={{ textAlign: 'center', margin: '50px 0' }}>
+                                <h1 style={{ fontSize: '32px', marginBottom: '16px' }}>Welcome to Vahan Bazar</h1>
+                                <p style={{ fontSize: '18px', color: '#6b7280', marginBottom: '30px' }}>
+                                    Your one-stop destination for two-wheelers
+                                </p>
+                                <button 
+                                    onClick={() => setShowLogin(true)} 
+                                    className="btn btn-primary"
+                                    style={{ fontSize: '16px', padding: '12px 24px' }}
+                                >
+                                    Get Started - Login
+                                </button>
+                            </div>
+                        )}
+
+                        {showLogin && !user && (
+                            <LoginForm onLogin={handleLogin} />
+                        )}
+
+                        {user && (
+                            <>
+                                <div style={{ margin: '20px 0' }}>
+                                    <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>
+                                        Welcome back, {user.username}!
+                                    </h1>
+                                    <p style={{ color: '#6b7280' }}>
+                                        {user.role === 'admin' ? 'Admin Dashboard' : 'Browse our collection of bikes'}
+                                    </p>
+                                </div>
+
+                                {user.role === 'admin' && <AdminPanel user={user} />}
+
+                                <Filters onFilterChange={handleFilterChange} />
+                                <BikeList bikes={filteredBikes} />
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

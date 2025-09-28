@@ -1,0 +1,29 @@
+{
+  "name": "vahan-bazar",
+  "version": "1.0.0",
+  "description": "A full-stack web application for buying, selling, and comparing two-wheelers",
+  "main": "index.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "setup-demo": "node setup-demo.js",
+    "install-all": "npm run install-backend && npm run install-frontend && npm run install-database",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "install-database": "cd database && npm install mysql2 bcryptjs",
+    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "start-backend": "cd backend && npm run dev",
+    "start-frontend": "cd frontend && npm start",
+    "demo": "cd frontend && npm start",
+    "db-reset": "cd database && node manage.js reset",
+    "db-seed": "cd database && node manage.js seed",
+    "db-clear": "cd database && node manage.js clear",
+    "db-status": "cd database && node manage.js status",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["bikes", "scooters", "two-wheelers", "marketplace", "react", "nodejs"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

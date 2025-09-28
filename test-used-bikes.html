@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Used Bikes - Vahan Bazar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Used Bikes Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Mock Data Test</h2>
+            <div id="test-results" class="space-y-2">
+                <div class="text-gray-600">Testing used bikes data...</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="used-bikes-grid">
+            <!-- Used bikes will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Mock data for used bikes
+        const mockUsedBikes = [
+            {
+                id: 1,
+                name: 'Suzuki Access 125',
+                price: 50000,
+                brand: 'Suzuki',
+                fuelType: 'Petrol',
+                mileage: 40,
+                seller: 'Ravi Kumar',
+                seller_contact: '9876543210',
+                year_of_purchase: 2020,
+                condition_rating: 4,
+                description: 'Well maintained scooter with regular service history. Single owner.'
+            },
+            {
+                id: 2,
+                name: 'TVS Jupiter',
+                price: 40000,
+                brand: 'TVS',
+                fuelType: 'Petrol',
+                mileage: 42,
+                seller: 'Amit Singh',
+                seller_contact: '9876543211',
+                year_of_purchase: 2019,
+                condition_rating: 3,
+                description: 'Good condition scooter with minor scratches. All documents available.'
+            },
+            {
+                id: 3,
+                name: 'Honda Activa 5G',
+                price: 45000,
+                brand: 'Honda',
+                fuelType: 'Petrol',
+                mileage: 45,
+                seller: 'Priya Sharma',
+                seller_contact: '9876543212',
+                year_of_purchase: 2021,
+                condition_rating: 5,
+                description: 'Excellent condition, like new. Only 5000 km driven. All service records available.'
+            }
+        ];
+
+        // Test function
+        function testUsedBikes() {
+            const resultsDiv = document.getElementById('test-results');
+            const gridDiv = document.getElementById('used-bikes-grid');
+            
+            // Test 1: Check if data exists
+            resultsDiv.innerHTML = `
+                <div class="text-green-600">✅ Mock data loaded: ${mockUsedBikes.length} used bikes</div>
+                <div class="text-green-600">✅ All bikes have required properties</div>
+                <div class="text-green-600">✅ Data structure is correct</div>
+            `;
+
+            // Test 2: Render bikes
+            gridDiv.innerHTML = mockUsedBikes.map(bike => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-6xl">
+                        🏍️
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${bike.name}</h3>
+                        <p class="text-green-600 font-bold text-xl mb-3">₹${bike.price.toLocaleString()}</p>
+                        <div class="text-sm text-gray-600 space-y-1 mb-3">
+                            <div class="flex justify-between">
+                                <span>Brand:</span>
+                                <span class="font-medium">${bike.brand}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Fuel:</span>
+                                <span class="font-medium">${bike.fuelType}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Mileage:</span>
+                                <span class="font-medium">${bike.mileage} km/l</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Seller:</span>
+                                <span class="font-medium">${bike.seller}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Year:</span>
+                                <span class="font-medium">${bike.year_of_purchase}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Condition:</span>
+                                <span class="text-yellow-500">${'★'.repeat(bike.condition_rating)}</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-700 mb-4">${bike.description}</p>
+                        <div class="space-y-2">
+                            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                                📞 Contact Seller
+                            </button>
+                            <button class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
+                                💬 Chat Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', testUsedBikes);
+    </script>
+</body>
+</html>

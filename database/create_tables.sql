@@ -1,0 +1,117 @@
+-- MySQL table creation script for Vahan Bazar
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('user', 'admin') DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE bikes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  price INT NOT NULL,
+  brand VARCHAR(50) NOT NULL,
+  fuelType VARCHAR(20) NOT NULL,
+  mileage INT NOT NULL,
+  image VARCHAR(255),
+  description TEXT,
+  specifications JSON,
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+CREATE TABLE used_bikes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  price INT NOT NULL,
+  brand VARCHAR(50) NOT NULL,
+  fuelType VARCHAR(20) NOT NULL,
+  mileage INT NOT NULL,
+  image VARCHAR(255),
+  seller VARCHAR(100) NOT NULL,
+  seller_contact VARCHAR(50),
+  year_of_purchase YEAR,
+  condition_rating INT CHECK (condition_rating >= 1 AND condition_rating <= 5),
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE showrooms (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  contact VARCHAR(50) NOT NULL,
+  city VARCHAR(50),
+  state VARCHAR(50),
+  pincode VARCHAR(10),
+  services JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE upcoming_launches (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  brand VARCHAR(50) NOT NULL,
+  launch_date DATE NOT NULL,
+  image VARCHAR(255),
+  expected_price INT,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_favorites (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  bike_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (bike_id) REFERENCES bikes(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_favorite (user_id, bike_id)
+);
+
+CREATE TABLE reviews (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  bike_id INT NOT NULL,
+  rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (bike_id) REFERENCES bikes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE test_ride_bookings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  showroom_id INT NOT NULL,
+  bike_id INT NOT NULL,
+  booking_date DATE NOT NULL,
+  booking_time TIME NOT NULL,
+  status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
+  contact_number VARCHAR(15),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (showroom_id) REFERENCES showrooms(id) ON DELETE CASCADE,
+  FOREIGN KEY (bike_id) REFERENCES bikes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE price_alerts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  bike_id INT NOT NULL,
+  target_price INT NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (bike_id) REFERENCES bikes(id) ON DELETE CASCADE
+);
