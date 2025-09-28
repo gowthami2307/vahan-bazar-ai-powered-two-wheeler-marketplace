@@ -5,7 +5,7 @@ Thank you to all the amazing people who have contributed to Vahan Bazar! 🏍️
 ## 🏆 Core Contributors
 
 ### Project Lead
-- **[Venkatatejadegala](https://github.com/Venkatatejadegala)** - Full-Stack Developer & Project Lead
+- **[BYTEBREAKERS](https://github.com/gowthami2307/vahan-bazar-ai-powered-two-wheeler-marketplace)** 
   - 🎯 Project architecture and planning
   - 💻 Frontend and backend development
   - 🎨 UI/UX design and implementation
@@ -16,7 +16,7 @@ Thank you to all the amazing people who have contributed to Vahan Bazar! 🏍️
 We welcome contributions from developers of all skill levels! Here's how you can help:
 
 ### 🐛 Bug Reports
-- Found a bug? Please report it in the [Issues](https://github.com/Venkatatejadegala/vahan-bazar/issues) section
+- Found a bug? Please report it in the [Issues](https://github.com/gowthami2307/vahan-bazar-ai-powered-two-wheeler-marketplace) section
 - Include detailed steps to reproduce the issue
 - Add screenshots or error messages if applicable
 
