@@ -668,6 +668,6 @@ SOFTWARE.
 [![GitHub forks](https://img.shields.io/github/forks/Venkatatejadegala/vahan-bazar?style=social)](https://github.com/Venkatatejadegala/vahan-bazar/network)
 [![GitHub watchers](https://img.shields.io/github/watchers/Venkatatejadegala/vahan-bazar?style=social)](https://github.com/Venkatatejadegala/vahan-bazar/watchers)
 
-**Made with ❤️ by [Venkatatejadegala](https://github.com/Venkatatejadegala)**
+**Made with ❤️ by [BYTEBREAKERS](https://github.com/gowthami2307/vahan-bazar-ai-powered-two-wheeler-marketplace )**
 
 </div>
