@@ -602,6 +602,10 @@ const FavoritesList = () => {
   );
 };
 
+function addToCart() {
+  
+}
+
 const ProfileSettings = () => {
   const { user, updateProfile } = useAuth();
   const [formData, setFormData] = useState({

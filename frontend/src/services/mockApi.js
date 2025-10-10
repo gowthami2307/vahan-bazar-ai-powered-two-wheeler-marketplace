@@ -3,55 +3,35 @@ import { mockUsers, mockBikes, mockUsedBikes, mockShowrooms, mockUpcoming, mockR
 // Simulate API delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Mock API class
 class MockAPI {
   constructor() {
     this.currentUser = null;
     this.favorites = new Set();
     this.bookings = [];
     this.priceAlerts = [];
+    this.cart = [];
   }
 
-  // Authentication methods
+  // ================= AUTH ==================
   async login(email, password) {
-    await delay(500); // Simulate network delay
-    
+    await delay(500);
     const user = mockUsers.find(u => u.email === email && u.password === password);
     if (user) {
       const token = `mock-token-${user.id}-${Date.now()}`;
       const userData = { ...user };
-      delete userData.password; // Remove password from response
-      
+      delete userData.password;
       mockStorage.setItem('token', token);
       mockStorage.setItem('user', JSON.stringify(userData));
       this.currentUser = userData;
-      
-      return {
-        success: true,
-        token,
-        user: userData
-      };
+      return { success: true, token, user: userData };
     }
-    
-    return {
-      success: false,
-      error: 'Invalid credentials'
-    };
+    return { success: false, error: 'Invalid credentials' };
   }
 
   async register(username, email, password) {
     await delay(500);
-    
-    // Check if user already exists
     const existingUser = mockUsers.find(u => u.email === email || u.username === username);
-    if (existingUser) {
-      return {
-        success: false,
-        error: 'User with this email or username already exists'
-      };
-    }
-    
-    // Create new user
+    if (existingUser) return { success: false, error: 'User with this email or username already exists' };
     const newUser = {
       id: mockUsers.length + 1,
       username,
@@ -60,43 +40,26 @@ class MockAPI {
       role: 'user',
       created_at: new Date().toISOString()
     };
-    
     mockUsers.push(newUser);
-    
     const token = `mock-token-${newUser.id}-${Date.now()}`;
     const userData = { ...newUser };
     delete userData.password;
-    
     mockStorage.setItem('token', token);
     mockStorage.setItem('user', JSON.stringify(userData));
     this.currentUser = userData;
-    
-    return {
-      success: true,
-      token,
-      user: userData
-    };
+    return { success: true, token, user: userData };
   }
 
   async verifyToken() {
     await delay(200);
-    
     const token = mockStorage.getItem('token');
     const userStr = mockStorage.getItem('user');
-    
     if (token && userStr) {
       const user = JSON.parse(userStr);
       this.currentUser = user;
-      return {
-        valid: true,
-        user
-      };
+      return { valid: true, user };
     }
-    
-    return {
-      valid: false,
-      error: 'Invalid token'
-    };
+    return { valid: false, error: 'Invalid token' };
   }
 
   async logout() {
@@ -105,9 +68,10 @@ class MockAPI {
     mockStorage.removeItem('user');
     this.currentUser = null;
     this.favorites.clear();
+    this.cart = [];
   }
 
-  // Bike methods
+  // ================= BIKE ==================
   async getBikes() {
     await delay(300);
     return mockBikes;
@@ -115,34 +79,21 @@ class MockAPI {
 
   async searchBikes(filters = {}) {
     await delay(400);
-    
     let filteredBikes = [...mockBikes];
-    
+
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filteredBikes = filteredBikes.filter(bike => 
+      filteredBikes = filteredBikes.filter(bike =>
         bike.name.toLowerCase().includes(searchTerm) ||
         bike.brand.toLowerCase().includes(searchTerm) ||
         bike.description.toLowerCase().includes(searchTerm)
       );
     }
-    
-    if (filters.brand) {
-      filteredBikes = filteredBikes.filter(bike => bike.brand === filters.brand);
-    }
-    
-    if (filters.price) {
-      filteredBikes = filteredBikes.filter(bike => bike.price <= parseInt(filters.price));
-    }
-    
-    if (filters.fuelType) {
-      filteredBikes = filteredBikes.filter(bike => bike.fuelType === filters.fuelType);
-    }
-    
-    if (filters.mileage) {
-      filteredBikes = filteredBikes.filter(bike => bike.mileage >= parseInt(filters.mileage));
-    }
-    
+
+    if (filters.brand) filteredBikes = filteredBikes.filter(bike => bike.brand === filters.brand);
+    if (filters.price) filteredBikes = filteredBikes.filter(bike => bike.price <= parseInt(filters.price));
+    if (filters.fuelType) filteredBikes = filteredBikes.filter(bike => bike.fuelType === filters.fuelType);
+    if (filters.mileage) filteredBikes = filteredBikes.filter(bike => bike.mileage >= parseInt(filters.mileage));
     return filteredBikes;
   }
 
@@ -166,14 +117,10 @@ class MockAPI {
     return [...new Set(mockBikes.map(bike => bike.fuelType))].sort();
   }
 
-  // User favorites
+  // ================= FAVORITES ==================
   async addToFavorites(bikeId) {
     await delay(300);
-    
-    if (!this.currentUser) {
-      throw new Error('Please login to add favorites');
-    }
-    
+    if (!this.currentUser) throw new Error('Please login to add favorites');
     this.favorites.add(parseInt(bikeId));
     return { message: 'Added to favorites' };
   }
@@ -189,14 +136,10 @@ class MockAPI {
     return mockBikes.filter(bike => this.favorites.has(bike.id));
   }
 
-  // Reviews
+  // ================= REVIEWS ==================
   async addReview(bikeId, rating, comment) {
     await delay(400);
-    
-    if (!this.currentUser) {
-      throw new Error('Please login to add reviews');
-    }
-    
+    if (!this.currentUser) throw new Error('Please login to add reviews');
     const review = {
       id: mockReviews.length + 1,
       user_id: this.currentUser.id,
@@ -206,7 +149,6 @@ class MockAPI {
       username: this.currentUser.username,
       created_at: new Date().toISOString()
     };
-    
     mockReviews.push(review);
     return { message: 'Review added successfully' };
   }
@@ -216,34 +158,75 @@ class MockAPI {
     return mockReviews.filter(review => review.bike_id === parseInt(bikeId));
   }
 
-  // Test ride booking
-  async bookTestRide(showroomId, bikeId, bookingDate, bookingTime, contactNumber) {
-    await delay(500);
-    
-    if (!this.currentUser) {
-      throw new Error('Please login to book test ride');
+  // ================= CART ==================
+  async addToCart(bikeId, quantity = 1) {
+    await delay(300);
+    if (!this.currentUser) throw new Error('Please login to add to cart');
+
+    const bike = mockBikes.find(b => b.id === parseInt(bikeId));
+    if (!bike) throw new Error('Bike not found');
+
+    const existing = this.cart.find(item => item.bike.id === bike.id);
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      this.cart.push({ bike, quantity });
     }
-    
-    const booking = {
-      id: this.bookings.length + 1,
-      user_id: this.currentUser.id,
-      showroom_id: parseInt(showroomId),
-      bike_id: parseInt(bikeId),
-      booking_date: bookingDate,
-      booking_time: bookingTime,
-      contact_number: contactNumber,
-      status: 'pending',
-      created_at: new Date().toISOString()
-    };
-    
-    this.bookings.push(booking);
-    return { 
-      message: 'Test ride booked successfully', 
-      booking_id: booking.id 
-    };
+
+    return { message: 'Added to cart', cart: this.cart };
   }
 
-  // Other data methods
+  async removeFromCart(bikeId) {
+    await delay(200);
+    this.cart = this.cart.filter(item => item.bike.id !== parseInt(bikeId));
+    return { message: 'Removed from cart', cart: this.cart };
+  }
+
+  async updateCartQuantity(bikeId, quantity) {
+    await delay(200);
+    const item = this.cart.find(i => i.bike.id === parseInt(bikeId));
+    if (!item) throw new Error('Item not in cart');
+
+    if (quantity <= 0) {
+      this.cart = this.cart.filter(i => i.bike.id !== parseInt(bikeId));
+    } else {
+      item.quantity = quantity;
+    }
+
+    return { message: 'Cart updated', cart: this.cart };
+  }
+
+  async getCart() {
+    await delay(200);
+    return this.cart;
+  }
+
+  async clearCart() {
+    await delay(200);
+    this.cart = [];
+    return { message: 'Cart cleared' };
+  }
+
+  async checkout() {
+    await delay(500);
+    if (!this.currentUser) throw new Error('Please login to checkout');
+    if (this.cart.length === 0) throw new Error('Cart is empty');
+
+    const totalAmount = this.cart.reduce((acc, item) => acc + item.bike.price * item.quantity, 0);
+    const order = {
+      order_id: `ORD-${Date.now()}`,
+      user_id: this.currentUser.id,
+      items: [...this.cart],
+      total: totalAmount,
+      created_at: new Date().toISOString(),
+      status: 'confirmed'
+    };
+
+    this.cart = [];
+    return { message: 'Checkout successful', order };
+  }
+
+  // ================= OTHER ==================
   async getUsedBikes() {
     await delay(300);
     return mockUsedBikes;
@@ -259,83 +242,11 @@ class MockAPI {
     return mockUpcoming;
   }
 
-  // Admin methods
+  // ================= ADMIN ==================
   async addBike(bikeData) {
     await delay(500);
-    
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      throw new Error('Admin access required');
-    }
-    
-    const newBike = {
-      id: mockBikes.length + 1,
-      ...bikeData,
-      created_by: this.currentUser.id,
-      created_at: new Date().toISOString()
-    };
-    
-    mockBikes.push(newBike);
-    return { 
-      message: 'Bike added successfully', 
-      bike_id: newBike.id 
-    };
-  }
+    if (!this.currentUser || this.currentUser.role !== 'admin') throw new Error('Admin access required');
 
-  async updateBike(id, bikeData) {
-    await delay(500);
-    
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      throw new Error('Admin access required');
-    }
-    
-    const bikeIndex = mockBikes.findIndex(bike => bike.id === parseInt(id));
-    if (bikeIndex === -1) {
-      throw new Error('Bike not found');
-    }
-    
-    mockBikes[bikeIndex] = { ...mockBikes[bikeIndex], ...bikeData };
-    return { message: 'Bike updated successfully' };
-  }
-
-  async deleteBike(id) {
-    await delay(500);
-    
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      throw new Error('Admin access required');
-    }
-    
-    const bikeIndex = mockBikes.findIndex(bike => bike.id === parseInt(id));
-    if (bikeIndex === -1) {
-      throw new Error('Bike not found');
-    }
-    
-    mockBikes.splice(bikeIndex, 1);
-    return { message: 'Bike deleted successfully' };
-  }
-
-  async getAdminStats() {
-    await delay(300);
-    
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      throw new Error('Admin access required');
-    }
-    
-    return {
-      totalBikes: mockBikes.length,
-      totalUsers: mockUsers.length,
-      totalReviews: mockReviews.length,
-      totalBookings: this.bookings.length
-    };
-  }
-
-  // Admin bike management methods
-  async addBike(bikeData) {
-    await delay(500);
-    
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      throw new Error('Admin access required');
-    }
-    
     const newBike = {
       id: Math.max(...mockBikes.map(b => b.id)) + 1,
       name: bikeData.name,
@@ -349,58 +260,53 @@ class MockAPI {
       created_by: this.currentUser.id,
       created_at: new Date().toISOString()
     };
-    
+
     mockBikes.push(newBike);
     return newBike;
   }
 
   async updateBike(bikeId, bikeData) {
     await delay(500);
-    
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      throw new Error('Admin access required');
-    }
-    
+    if (!this.currentUser || this.currentUser.role !== 'admin') throw new Error('Admin access required');
+
     const bikeIndex = mockBikes.findIndex(bike => bike.id === parseInt(bikeId));
-    if (bikeIndex === -1) {
-      throw new Error('Bike not found');
-    }
-    
+    if (bikeIndex === -1) throw new Error('Bike not found');
+
     const updatedBike = {
       ...mockBikes[bikeIndex],
-      name: bikeData.name,
+      ...bikeData,
       price: parseInt(bikeData.price),
-      brand: bikeData.brand,
-      fuelType: bikeData.fuelType,
-      mileage: parseInt(bikeData.mileage) || 0,
-      image: bikeData.image || mockBikes[bikeIndex].image,
-      description: bikeData.description || '',
-      specifications: bikeData.specifications || mockBikes[bikeIndex].specifications,
+      mileage: parseInt(bikeData.mileage),
       updated_at: new Date().toISOString()
     };
-    
+
     mockBikes[bikeIndex] = updatedBike;
     return updatedBike;
   }
 
   async deleteBike(bikeId) {
     await delay(500);
-    
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      throw new Error('Admin access required');
-    }
-    
+    if (!this.currentUser || this.currentUser.role !== 'admin') throw new Error('Admin access required');
+
     const bikeIndex = mockBikes.findIndex(bike => bike.id === parseInt(bikeId));
-    if (bikeIndex === -1) {
-      throw new Error('Bike not found');
-    }
-    
+    if (bikeIndex === -1) throw new Error('Bike not found');
+
     mockBikes.splice(bikeIndex, 1);
     return { message: 'Bike deleted successfully' };
   }
+
+  async getAdminStats() {
+    await delay(300);
+    if (!this.currentUser || this.currentUser.role !== 'admin') throw new Error('Admin access required');
+
+    return {
+      totalBikes: mockBikes.length,
+      totalUsers: mockUsers.length,
+      totalReviews: mockReviews.length,
+      totalBookings: this.bookings.length
+    };
+  }
 }
 
-// Create singleton instance
 const mockAPI = new MockAPI();
-
 export default mockAPI;
